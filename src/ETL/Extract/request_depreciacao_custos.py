@@ -5,6 +5,7 @@ Código para Realizar requisição na consulta de depreciação do tesouro nacio
 """
 import os
 import requests
+import sys
 
 from typing import Optional
 from dotenv import load_dotenv
@@ -66,6 +67,7 @@ class DepreciacaoCusto:
 
         """
         total_data_count = 0
+        total_size_bytes = 0
 
         for year in range(self.start_yaer, self.end_year + 1):
             for month in range(1, 13):
@@ -76,13 +78,17 @@ class DepreciacaoCusto:
 
                     data = response.json()
                     data_count = len(data.get("items", []))
+                    data_size = sys.getsizeof(response.content)
 
                     print(f"Year: {year}, Month: {month} - Data_count: {data_count}")
                     total_data_count += data_count
+                    total_size_bytes += data_size
+
                 except requests.exceptions.RequestException as e:
                     print(f"An error occurred for {year}-{month}: {e}")
-
+        total_size_mb = total_size_bytes / (1024*10124)
         print(f"\nTotal Data Colleted: {total_data_count}")
+        print(f"Total Volume: {total_size_mb: .2f} Mb")
 
 
 fetcher = DepreciacaoCusto()
